@@ -24,33 +24,5 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        tv_request.setOnClickListener {
-            GlobalScope.launch {
-                requestPlaceholders()
-            }
-        }
     }
-
-    private suspend fun requestPlaceholders(){
-        try {
-            val result = httpGet("https://jsonplaceholder.typicode.com/photos")
-            parseJson(result)
-        }catch (e:Exception){
-        //error handling part just let user know the failure
-            toast("連線失敗，請稍後再試")
-        }
-//                Log.d("MainActivity","result:$result")
-    }
-
-    private fun parseJson(jsonString: String) {
-        val array = JSONArray(jsonString)
-        val list = mutableListOf<Placeholder>()
-        for (i in 0 until array.length()-1){
-            val item = array.getJSONObject(i)
-            list.add(item.asPlaceHolder())
-        }
-//        Log.d("MainActivity","list size:${list.size}")
-    }
-
 }

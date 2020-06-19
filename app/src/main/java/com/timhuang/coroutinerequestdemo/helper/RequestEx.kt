@@ -1,13 +1,17 @@
 package com.timhuang.coroutinerequestdemo.helper
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.timhuang.coroutinerequestdemo.config.RequestException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+
 
 suspend fun httpGet(myURL: String?): String {
     val inputStream: InputStream
@@ -30,6 +34,21 @@ suspend fun httpGet(myURL: String?): String {
             convertInputStreamToString(inputStream)
         else
             throw RequestException
+    }
+}
+
+
+suspend fun getBitmap(url:String): Bitmap? {
+    return withContext(Dispatchers.IO){
+        try {
+            val url = URL(url)
+            val inputStream = url.openConnection().getInputStream()
+            val image = BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+            image
+        } catch (e: IOException) {
+            null
+        }
     }
 }
 

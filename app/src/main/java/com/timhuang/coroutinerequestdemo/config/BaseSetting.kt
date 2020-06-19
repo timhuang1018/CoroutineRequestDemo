@@ -1,5 +1,7 @@
 package com.timhuang.coroutinerequestdemo.config
 
+import androidx.navigation.NavDirections
+
 object Config{
 
     //for parsing
@@ -12,3 +14,8 @@ object Config{
 
 //dummy exception , skip error handling for now
 object RequestException:Exception()
+
+sealed class Result{
+    data class Success(val nav:NavDirections):Result()
+    data class Failure(val info:String):Result()
+}

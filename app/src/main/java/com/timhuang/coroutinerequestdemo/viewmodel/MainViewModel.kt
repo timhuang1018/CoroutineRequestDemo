@@ -1,5 +1,6 @@
 package com.timhuang.coroutinerequestdemo.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,10 +12,11 @@ import com.timhuang.coroutinerequestdemo.helper.ParseHelper
 import com.timhuang.coroutinerequestdemo.helper.getBitmap
 import com.timhuang.coroutinerequestdemo.helper.httpGet
 import com.timhuang.coroutinerequestdemo.pages.FirstPageDirections
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class MainViewModel : ViewModel() {
 
     private val _data = MutableLiveData<List<Placeholder>>()
@@ -22,7 +24,7 @@ class MainViewModel : ViewModel() {
     get() = _data
 
     private val cache = mutableMapOf<Int,ImageContainer>()
-//    val broadcastChannel = BroadcastChannel<ImageContainer>()
+    val broadcastChannel = BroadcastChannel<ImageContainer>(200)
 
     val state = MutableLiveData<EventWrapper<Result>>()
     val loading = MutableLiveData<Boolean>()
@@ -46,10 +48,13 @@ class MainViewModel : ViewModel() {
 
     }
 
-    fun loadBitmap(){
+    fun loadBitmap(item: Placeholder) {
         viewModelScope.launch {
-//            getBitmap()
-//            val channel = Channel<>()
+            val bitmap = getBitmap(item.thumbnailUrl)
+//            Log.d("MainViewModel","get bitmap :$bitmap")
+            if (bitmap!=null){
+                broadcastChannel.send(ImageContainer(id = item.id,bitmap = bitmap))
+            }
         }
     }
 

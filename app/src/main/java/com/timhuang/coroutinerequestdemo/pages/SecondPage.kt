@@ -36,7 +36,7 @@ class SecondPage :Fragment() {
     private fun init() {
         viewModel = activity?.run { ViewModelProvider(this).get(MainViewModel::class.java) } ?: throw IllegalArgumentException("Wrong Activity")
 
-        adapter = GridItemsAdapter()
+        adapter = GridItemsAdapter(viewModel)
         vertical_list.adapter = adapter
         vertical_list.layoutManager = GridLayoutManager(requireContext(),4)
 

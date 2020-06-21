@@ -34,6 +34,20 @@
         android:maxLines="2"
         />
 
+    <ProgressBar
+        android:id="@+id/item_progressbar"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="30dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="@id/iv_thumb_nail"
+        app:layout_constraintTop_toTopOf="@id/iv_thumb_nail"
+        app:layout_constraintStart_toStartOf="@id/iv_thumb_nail"
+        app:layout_constraintEnd_toEndOf="@id/iv_thumb_nail"
+        />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,16 +39,29 @@ suspend fun httpGet(myURL: String?): String {
 
 
 suspend fun getBitmap(url:String): Bitmap? {
-    return withContext(Dispatchers.IO){
+//    Log.d("RequestEx","getBitmap called url:$url")
+    return withContext(Dispatchers.Default){
         try {
-            val url = URL(url)
-            val inputStream = url.openConnection().getInputStream()
-            val image = BitmapFactory.decodeStream(inputStream)
-            inputStream.close()
+            val image = BitmapFactory.decodeStream(getInputStream(url))
             image
         } catch (e: IOException) {
+            Log.e("RequestEx","getBitmap exception :${e.message}")
             null
         }
+    }
+}
+
+//this request need user agent , or the download will fail
+suspend fun getInputStream(url: String):InputStream{
+    try {
+        val url = URL(url)
+        val connection = url.openConnection()
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2")
+        connection.connect()
+        return connection.getInputStream()
+    }catch (e:Exception){
+        Log.e("RequestEx","getInputStream called and error :${e.cause},${e.localizedMessage}")
+        throw e
     }
 }
 

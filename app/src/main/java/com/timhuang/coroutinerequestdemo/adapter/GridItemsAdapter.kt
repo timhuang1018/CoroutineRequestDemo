@@ -1,5 +1,6 @@
 package com.timhuang.coroutinerequestdemo.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.timhuang.coroutinerequestdemo.R
 import com.timhuang.coroutinerequestdemo.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.item_placeholder.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 
 class GridItemsAdapter(private val viewModel: MainViewModel) :ListAdapter<Placeholder,GridItemViewHolder>(PlaceHolderDiff){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridItemViewHolder {
@@ -34,20 +34,53 @@ class GridItemsAdapter(private val viewModel: MainViewModel) :ListAdapter<Placeh
 
 }
 
-class GridItemViewHolder(itemView:View,val viewModel: MainViewModel):RecyclerView.ViewHolder(itemView){
+@ExperimentalCoroutinesApi
+class GridItemViewHolder(itemView:View, val viewModel: MainViewModel):RecyclerView.ViewHolder(itemView){
 
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(SupervisorJob()+Dispatchers.Main)
     fun bind(item:Placeholder){
-        itemView.tv_id_number.text = item.id.toString()
-        itemView.tv_title.text = item.title
+        //clear loading if view get reused still left state
+        setLoaging(false)
+
         with(itemView.iv_thumb_nail){
-            viewModel.hasCache(item.id)?.let { this.setImageBitmap(it.bitmap) } ?: waitForDrawing()
+            viewModel.hasCache(item.id)?.let {
+                setContext(item)
+                this.setImageBitmap(it.bitmap) } ?: drawNow(item)
         }
     }
 
-    private fun waitForDrawing() {
+    private fun setContext(item: Placeholder) {
+        itemView.tv_id_number.text = item.id.toString()
+        itemView.tv_title.text = item.title
+    }
+
+    private fun drawNow(item: Placeholder) {
+        //ask viewmodel to draw
+        viewModel.loadBitmap(item)
+        //set loading
+        setLoaging(true)
+        //wait for drawing
         scope.launch {
-            viewModel
+            val flow = viewModel.broadcastChannel
+                .asFlow()
+            flow.collect {container->
+
+                Log.d("GridItemViewHolder","flow:$flow , receive item :${container.id}")
+                if (container.id==item.id){
+                    itemView.iv_thumb_nail.setImageBitmap(container.bitmap)
+                    setContext(item)
+                    setLoaging(false)
+                    cancel()
+                }
+            }
+        }
+    }
+
+    private fun setLoaging(isLoading: Boolean) {
+        if (isLoading){
+            itemView.item_progressbar.visibility = View.VISIBLE
+        }else{
+            itemView.item_progressbar.visibility = View.GONE
         }
     }
 

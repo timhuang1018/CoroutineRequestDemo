@@ -1,9 +1,11 @@
 package com.timhuang.coroutinerequestdemo.viewmodel
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavDirections
 import com.timhuang.coroutinerequestdemo.config.Result
 import com.timhuang.coroutinerequestdemo.data.ImageContainer
 import com.timhuang.coroutinerequestdemo.data.Placeholder
@@ -28,6 +30,8 @@ class MainViewModel : ViewModel() {
 
     val state = MutableLiveData<EventWrapper<Result>>()
     val loading = MutableLiveData<Boolean>()
+
+    val navigation = MutableLiveData<EventWrapper<NavDirections>>()
 
     fun requestPlaceholders(){
 
@@ -56,6 +60,10 @@ class MainViewModel : ViewModel() {
                 broadcastChannel.send(ImageContainer(id = item.id,bitmap = bitmap))
             }
         }
+    }
+
+    suspend fun loadBitmap(url:String): Bitmap? {
+        return getBitmap(url)
     }
 
     fun hasCache(id: Int): ImageContainer? {

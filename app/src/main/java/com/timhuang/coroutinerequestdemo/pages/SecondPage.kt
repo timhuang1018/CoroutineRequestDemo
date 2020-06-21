@@ -48,5 +48,12 @@ class SecondPage :Fragment() {
             findNavController().navigateUp()
         }
 
+        viewModel.navigation.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let { thirdPage->
+                findNavController().navigate(thirdPage)
+            }
+
+        })
+
     }
 }

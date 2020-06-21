@@ -25,5 +25,9 @@
     <fragment
         android:id="@+id/thirdPage"
         android:name="com.timhuang.coroutinerequestdemo.pages.ThirdPage"
-        android:label="ThirdPage" />
+        android:label="ThirdPage" >
+        <argument
+            android:name="placeholder"
+            app:argType="com.timhuang.coroutinerequestdemo.data.Placeholder" />
+    </fragment>
 </navigation>

@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.timhuang.coroutinerequestdemo.R
+import com.timhuang.coroutinerequestdemo.helper.EventWrapper
+import com.timhuang.coroutinerequestdemo.pages.SecondPageDirections
 import com.timhuang.coroutinerequestdemo.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.item_placeholder.view.*
 import kotlinx.coroutines.*
@@ -70,10 +72,17 @@ class GridItemViewHolder(itemView:View, val viewModel: MainViewModel):RecyclerVi
                     itemView.iv_thumb_nail.setImageBitmap(container.bitmap)
                     setContext(item)
                     setLoaging(false)
+                    itemView.setOnClickListener {
+                        goThirdPage(item)
+                    }
                     cancel()
                 }
             }
         }
+    }
+
+    private fun goThirdPage(item: Placeholder) {
+        viewModel.navigation.value = EventWrapper(SecondPageDirections.actionSecondPageToThirdPage(item))
     }
 
     private fun setLoaging(isLoading: Boolean) {
